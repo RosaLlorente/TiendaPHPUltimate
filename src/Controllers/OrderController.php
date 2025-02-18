@@ -2,7 +2,7 @@
 namespace Controllers;
 
 use Lib\Pages;
-use Lib\Utils;
+use Lib\PHPMailerClass;
 use Models\OrderLine;
 use Models\Order;
 use Services\OrderService;
@@ -16,7 +16,7 @@ class OrderController{
     private OrderService $orderService;
     private OrderLineService $orderLineService;
     private UserService $userService;
-    private Utils $utils;
+    private PHPMailerClass $phpmailer;
 
     //CONSTRUCTOR
     function __construct()
@@ -25,7 +25,7 @@ class OrderController{
         $this->orderService = new OrderService();
         $this->orderLineService = new OrderLineService();
         $this->userService = new UserService();
-        $this->utils = new Utils();
+        $this->phpmailer = new PHPMailerClass();
     }
 
     //METODOS
@@ -84,7 +84,7 @@ class OrderController{
                             if ($emailData) 
                             {
                                 $email = $emailData;
-                                $this->utils->enviarCorreoConfirmacion($email);
+                                $this->phpmailer->enviarCorreoConfirmacion($email);
                             } 
                             else 
                             {
