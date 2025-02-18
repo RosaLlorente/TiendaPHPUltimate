@@ -10,7 +10,8 @@ class ErrorController{
      *
      * @return void
      */
-    public static function error404(){
+    public static function error404()
+    {
         $pages = new Pages();
         $pages->render('error/error404',['titulo' => 'Pagina no encontrada']);
     }

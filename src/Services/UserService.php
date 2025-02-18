@@ -34,6 +34,8 @@ class UserService{
      *
      * Este método se encarga de conectar el controlador con el repositorio,para acceder a la base de datos.
      * 
+     * @param User $User El objeto User que contiene los datos del usuario a crear.
+     * 
      * @return User Devuelve los datos anteriormente introducidos por el usuario
      */
     public function LoginUser($User): bool
@@ -62,15 +64,15 @@ class UserService{
     }
 
     /**
-     * Obtiene el email de un usuario.
+     * Obtiene el email y el nombre de un usuario.
      *
-     * Este método se encarga de obtener el email de un usuario, incluyendo su nombre, apellidos, email, password, rol, fecha de creación y imagen.
+     * Este método se encarga de obtener el email y el nombre de un usuario.
      * 
      * @param int $id El id del usuario.
      * 
-     * @return string|null Devuelve el email del usuario especificado, o null si no se encuentra ningún usuario con ese id.
+     * @return array El email y el nombre del usuario.
      */
-    public function getUserById(int $id): string
+    public function getUserById(int $id): ?array
     {
         return $this->userRepository->getUserById($id);
     }

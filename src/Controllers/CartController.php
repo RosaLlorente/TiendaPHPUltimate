@@ -50,7 +50,7 @@ class CartController {
      * 
      * @return void
      */
-    public function addProductCart($id): void
+    public function addProductCart($id): void 
     {
         $product = $this->productService->GetProduct($id);
         if(!$product)
@@ -139,6 +139,10 @@ class CartController {
                     {
                         $_SESSION['success'] = "La cantidad del producto ha sido actualizada.";
                     }
+                }
+                else
+                {
+                    $_SESSION['error'] = "No hay cantidad suficiente para el producto.";
                 }
             } 
             else 

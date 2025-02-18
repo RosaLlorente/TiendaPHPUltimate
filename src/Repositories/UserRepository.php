@@ -23,6 +23,8 @@ class UserRepository{
      *
      * Este método se encarga de conectar con la base de datos e interactua con ella para realizar la insercción de un nuevo usuario.
      * 
+     * @param User $user El objeto User que contiene los datos del usuario a crear.
+     * 
      * @return bool Devuelve true si la ejecución ha sido exitosa,devuelve false si no ha sido exitosa.
      */
     public function create(User $user) : bool
@@ -70,7 +72,9 @@ class UserRepository{
      * para extraer los datos de un usuario,luego verificara si los datos coinciden con los anteriores
      * que introdujo el usuario en el formulario.
      * 
-     * @return bool Devuelve true si la ejecución ha sido exitosa,devuelve false si no ha sido exitosa.
+     * @param string $email El email del usuario.
+     * @param string $password La contraseña del usuario.
+     * @return array|null Devuelve el email y nombre del usuario especificado, o null si no se encuentra ningún usuario con ese id.
      */
     public function login(string $email, string $password): ?array
     {
@@ -103,25 +107,23 @@ class UserRepository{
         }
     }
 
-    /**
-     * Obtiene el email de un usuario.
-     *
-     * Este método se encarga de obtener el email de un usuario, incluyendo su nombre, apellidos, email, password, rol, fecha de creación y imagen.
+    /** 
+     * Obtiene el email y nombre de un usuario.
      * 
      * @param int $id El id del usuario.
+     * @return array|null Devuelve el email y nombre del usuario especificado, o null si no se encuentra ningún usuario con ese id.
      * 
-     * @return string|null Devuelve el email del usuario especificado, o null si no se encuentra ningún usuario con ese id.
      */
-    public function getUserById(int $id)
+    public function getUserById(int $id): ?array
     {
         try 
         {
-            $sql = $this->db->prepare('SELECT email FROM usuarios WHERE id = :id');
+            $sql = $this->db->prepare('SELECT email,nombre FROM usuarios WHERE id = :id');
             $sql->bindValue(':id', $id, PDO::PARAM_INT);
             $sql->execute();
             $result = $sql->fetch(PDO::FETCH_ASSOC);
     
-            return $result ? $result['email'] : null;
+            return $result ? $result : null;
         } 
         catch(PDOException $err) 
         {

@@ -436,32 +436,4 @@ class ProductRepository{
         }
     }
 
-    /**
-     * Obtiene todos los productos con stock positivo.
-     *
-     * Este método se encarga de obtener todos los productos con stock positivo, incluyendo su nombre, descripción, precio, stock, oferta, fecha de creación y imagen.
-     * 
-     * @return array Devuelve una lista de productos con stock positivo.
-     */
-    public function getProductsWithStockPositive(): array
-    {
-        try{
-            $sqlCheck = $this->db->prepare( 'SELECT * FROM productos WHERE stock > 0');
-            $sqlCheck->execute();
-            $productos = $sqlCheck->fetchAll(PDO::FETCH_ASSOC);
-            return $productos;
-        }
-        catch (PDOException $err) 
-        {
-            error_log("Error al actualizar el stock: " . $err->getMessage());
-            return false;
-        } 
-        finally 
-        {
-            if (isset($sqlCheck)) 
-            {
-                $sqlCheck->closeCursor();
-            }
-        }
-    }
 }

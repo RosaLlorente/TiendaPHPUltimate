@@ -52,4 +52,42 @@ class OrderLineRepository
             }
         }
     }
+
+    /**
+     * Obtiene las líneas de pedido de un pedido.
+     *
+     * Este método se encarga de obtener las líneas de pedido de un pedido, incluyendo su nombre, apellidos, email, password, rol, fecha de creación y imagen.
+     * 
+     * @param int $orderId El id del pedido.
+     * 
+     * @return array Devuelve una lista de líneas de pedido del pedido especificado.
+     */
+    public function getOrderLineById(int $orderId): array
+    {
+        try
+        {
+            $sql = $this->db->prepare('
+            SELECT lineas_pedidos.*, productos.nombre AS producto_nombre, productos.precio AS producto_precio
+            FROM lineas_pedidos
+            JOIN productos ON lineas_pedidos.producto_id = productos.id
+            WHERE lineas_pedidos.pedido_id = :orderId
+            ');
+            $sql->bindParam(':orderId', $orderId, PDO::PARAM_INT);
+            $sql->execute();
+            $result = $sql->fetchAll(PDO::FETCH_ASSOC);
+            return $result  ?: [];
+        }
+        catch(PDOException $err)
+        {
+            error_log("Error al crear el pedido: " . $err->getMessage());
+            return false;
+        }
+        finally
+        {
+            if(isset($sql))
+            {
+                $sql->closeCursor();
+            }
+        }
+    }
 }

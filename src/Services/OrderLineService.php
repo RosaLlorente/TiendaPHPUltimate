@@ -28,4 +28,18 @@ class OrderLineService{
     {
         $this->orderLineRepository->OrderLine($OrderLine);
     }
+
+    /**
+     * Obtiene las líneas de pedido de un pedido.
+     *
+     * Este método se encarga de obtener las líneas de pedido de un pedido, incluyendo su nombre, apellidos, email, password, rol, fecha de creación y imagen.
+     * 
+     * @param int $orderId El id del pedido.
+     * 
+     * @return array Devuelve una lista de líneas de pedido del pedido especificado.
+     */
+    public function getOrderLineById(int $orderId): array
+    {
+        return $this->orderLineRepository->getOrderLineById($orderId);
+    }
 }

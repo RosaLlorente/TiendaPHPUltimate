@@ -72,4 +72,140 @@ class OrderRepository{
         }
     }
     
+    /**
+     * Obtiene todos los pedidos de un usuario.
+     *
+     * Este método se encarga de obtener todos los pedidos de un usuario, incluyendo su nombre, apellidos, email, password, rol, fecha de creación y imagen.
+     * 
+     * @param int $id El id del usuario.
+     * 
+     * @return array Devuelve una lista de pedidos del usuario especificado.
+     */
+    public function getOrderByIdUser($id): ?array
+    {
+        try
+        {
+            $sql = $this->db->prepare('SELECT * FROM pedidos WHERE usuario_id = :id');
+            $sql->bindParam(':id', $id, PDO::PARAM_INT);
+            $sql->execute();
+            $result = $sql->fetchAll(PDO::FETCH_ASSOC);
+            return $result  ?: [];
+        }
+        catch(PDOException $err)
+        {
+            error_log("Error al crear el pedido: " . $err->getMessage());
+            return false;
+        }
+        finally
+        {
+            if(isset($sql))
+            {
+                $sql->closeCursor();
+            }
+            if(isset($sql))
+            {
+                $sql->closeCursor();
+            }
+        }
+    }
+
+    /**
+     * Obtiene todos los pedidos.
+     *
+     * Este método se encarga de obtener todos los pedidos, incluyendo su nombre, apellidos, email, password, rol, fecha de creación y imagen.
+     * 
+     * @return array Devuelve una lista de pedidos.
+     */
+    public function getAllOrders(): ?array
+    {
+        try
+        {
+            $sql = $this->db->prepare('SELECT * FROM pedidos ORDER BY usuario_id ASC');
+            $sql->execute();
+            $result = $sql->fetchAll(PDO::FETCH_ASSOC);
+            return $result  ?: [];
+        }
+        catch(PDOException $err)
+        {
+            error_log("Error al crear el pedido: " . $err->getMessage());
+            return [];
+        }
+        finally
+        {
+            if(isset($sql))
+            {
+                $sql->closeCursor();
+            }
+        }
+    }
+
+    /**
+     * Actualiza el estado de un pedido.
+     *
+     * Este método se encarga de actualizar el estado de un pedido, incluyendo su nombre, apellidos, email, password, rol, fecha de creación y imagen.
+     * 
+     * @param int $id El id del pedido.
+     * @param string $estado El estado del pedido.
+     * 
+     * @return bool Devuelve true si la actualización fue exitosa, de lo contrario false.
+     */
+    public function updateOrderStatus($id, $estado): bool
+    {
+        try {
+            $sql = $this->db->prepare('UPDATE pedidos SET estado = :estado WHERE id = :id');
+            $sql->bindParam(':estado', $estado, PDO::PARAM_STR);  
+            $sql->bindParam(':id', $id, PDO::PARAM_INT);
+            $sql->execute();
+            return true;
+        } 
+        catch (PDOException $err) 
+        {
+            error_log("Error al actualizar el estado del pedido: " . $err->getMessage());
+            return false;
+        } 
+        finally 
+        {
+            if (isset($selectQuery)) 
+            {
+                $selectQuery->closeCursor();
+            }
+            if (isset($sql)) 
+            {
+                $sql->closeCursor();
+            }
+        }
+    }   
+
+    /**
+     * Obtiene los datos de un pedido.
+     *
+     * Este método se encarga de obtener los datos de un pedido, incluyendo su nombre, apellidos, email, password, rol, fecha de creación y imagen.
+     * 
+     * @param int $id El id del pedido.
+     * 
+     * @return array|null Devuelve los datos del pedido especificado, o null si no se encuentra ningún pedido con ese id.
+     */
+    public function getDataOrder($id): ?array
+    {
+        try 
+        {
+            $sql = $this->db->prepare("SELECT estado,usuario_id FROM pedidos WHERE id = :id");
+            $sql->bindParam(':id', $id, PDO::PARAM_INT);
+            $sql->execute();
+            $result = $sql->fetchAll(PDO::FETCH_ASSOC);
+            return $result  ?: [];
+        } 
+        catch(PDOException $err) 
+        {
+            error_log("Error al crear el pedido: " . $err->getMessage());
+            return false;
+        } 
+        finally 
+        {
+            if(isset($sql)) 
+            {
+                $sql->closeCursor();
+            }
+        }
+    }
 }

@@ -147,7 +147,24 @@ class Routes{
         Router::add('POST','/order',function(){
             (new OrderController())->Order();
         });
-            
+        Router::add('GET','/HandleOrder',function(){
+            (new OrderController())->HandleOrder();
+        });
+        Router::add('POST','/HandleOrder',function(){
+            (new OrderController())->HandleOrder();
+        });
+        Router::add('GET','/UpdateStatusOrder',function(){
+            (new OrderController())->UpdateStatusOrder();
+        });
+        Router::add('POST','/UpdateStatusOrder',function(){
+            (new OrderController())->UpdateStatusOrder();
+        });
+        Router::add('GET','SeeMyOrders/:id',function($id){
+            (new OrderController())->SeeMyOrders($id);
+        });
+        Router::add('POST','SeeMyOrders/:id',function($id){
+            (new OrderController())->SeeMyOrders($id);
+        });
 
         //ERROR 404
         Router::add('GET','/not-found',function(){
