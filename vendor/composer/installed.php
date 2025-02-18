@@ -3,7 +3,7 @@
         'name' => 'usuario/tienda-php',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'adfe09f8a2fc0069c378ea4236a22d0c2e3b7124',
+        'reference' => 'dad508bdbb9d83b6cdaafcd4ef8ea6110d15bc64',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -76,7 +76,7 @@
         'usuario/tienda-php' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'adfe09f8a2fc0069c378ea4236a22d0c2e3b7124',
+            'reference' => 'dad508bdbb9d83b6cdaafcd4ef8ea6110d15bc64',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
