@@ -191,9 +191,9 @@ class UserController{
     }
 
     public function VerifyEmail()
-    {die('llega');
+    {
         if (isset($_GET['token'])) 
-        {die('llega');  
+        {
             try 
             {
                 $token = $_GET['token'];
