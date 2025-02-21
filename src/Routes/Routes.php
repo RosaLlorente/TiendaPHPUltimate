@@ -19,6 +19,11 @@ class Routes{
         });
 
         //USUARIO
+        //Verify Email
+        Router::add('GET', '/User/verifyEmail', function() {
+            (new UserController())->VerifyEmail();
+        });
+        
         //Login
         Router::add('GET','/login',function(){
             (new UserController())->Login();

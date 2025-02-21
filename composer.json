@@ -19,6 +19,9 @@
         "vlucas/phpdotenv": "^5.6",
         "stefangabos/zebra_pagination": "^2.4",
         "phpmailer/phpmailer": "^6.9",
-        "tecnickcom/tcpdf": "^6.8"
+        "tecnickcom/tcpdf": "^6.8",
+        "paypal/paypal-server-sdk": "^0.6.1",
+        "paypal/paypal-checkout-sdk": "^1.0",
+        "firebase/php-jwt": "^6.11"
     }
 }

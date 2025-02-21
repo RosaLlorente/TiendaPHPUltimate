@@ -13,6 +13,9 @@ class User{
         private string $email,
         private string $password,
         private string $role,
+        private bool $confirmado = false,
+        private string $token = '',
+        private string $token_exp = '',
     ){
         $this->id = $id;
         $this->nombre = $nombre;
@@ -45,6 +48,18 @@ class User{
     {
         $this->role = $role;
     }
+    public function setConfirmado(bool $confirmado): void
+    {
+        $this->confirmado = $confirmado;
+    }
+    public function setToken(string $token): void
+    {
+        $this->token = $token;
+    }
+    public function setTokenExpiration(string $token_exp): void
+    {
+        $this->token_exp = $token_exp;
+    }
 
     //GETTERS
     public function getId(): int|null
@@ -70,6 +85,18 @@ class User{
     public function getRole(): string
     {
         return $this->role;
+    }
+    public function getConfirmado(): bool
+    {
+        return $this->confirmado;
+    }
+    public function getToken(): string
+    {
+        return $this->token;
+    }
+    public function getTokenExpiration(): int
+    {
+        return $this->token_exp;
     }
 
     //METODOS
@@ -256,7 +283,8 @@ class User{
             apellidos: $data['apellidos'] ?? '',
             email: $data['email'],
             password: $data['password'],
-            role: $data['role'] ?? 'user'
+            role: $data['role'] ?? 'user',
+            confirmado: $data['confirmado']  ?? FALSE ?? TRUE
         );
     }
 

@@ -30,26 +30,26 @@ class UserRepository{
     public function create(User $user) : bool
     {
         try{
-            //comprobar si el email ya está registrado
-            $sql = $this->db->prepare('SELECT COUNT(*) FROM usuarios WHERE email = :email');
-            $sql->bindValue(':email', $user->getEmail(), PDO::PARAM_STR);
-            $sql->execute();
-
-            if ($sql->fetchColumn() > 0) {
-                $_SESSION['errores'] = ['El email ya está registrado.'];
-                return false;
-            }
-
             //registro del usuario
-            $sql = $this->db->prepare('INSERT INTO usuarios (nombre,apellidos,email,password,rol) VALUES (:nombre, :apellidos, :email, :password, :rol)');
+            $sql = $this->db->prepare('INSERT INTO usuarios (nombre,apellidos,email,password,rol,token,token_exp) VALUES (:nombre, :apellidos, :email, :password, :rol, :token, :token_exp)');
             $sql->bindValue(':nombre', $user->getNombre(),PDO::PARAM_STR);
             $sql->bindValue(':apellidos', $user->getApellidos(),PDO::PARAM_STR);
             $sql->bindValue(':email', $user->getEmail(),PDO::PARAM_STR);
             $sql->bindValue(':password', $user->getPassword(),PDO::PARAM_STR);
             $sql->bindValue(':rol', $user->getRole(),PDO::PARAM_STR);
+            $sql->bindValue(':token', $user->getToken(),PDO::PARAM_STR);
+            $sql->bindValue(':token_exp', $user->getTokenExpiration(),PDO::PARAM_INT);
 
             $sql->execute();
-            return true;
+            
+            if ($sql->rowCount() > 0) 
+            {
+                return true;  
+            } 
+            else 
+            {
+                return false; 
+            }
         }
         catch(PDOException $err)
         {
@@ -136,6 +136,87 @@ class UserRepository{
             {
                 $sql->closeCursor();
             }
+        }
+    }
+
+    public function checkUserByEmail(string $email): bool
+    {
+        try 
+        {
+            $sql = $this->db->prepare('SELECT COUNT(*) FROM usuarios WHERE email = :email');
+            $sql->bindValue(':email', $email, PDO::PARAM_STR);
+            $sql->execute();
+            $result = $sql->fetchColumn();
+    
+            return $result > 0 ? true : false;
+        } 
+        catch(PDOException $err) 
+        {
+            error_log("Error al buscar el email:" . $err->getMessage());
+            return false;
+        } 
+        finally 
+        {
+            if(isset($sql)) 
+            {
+                $sql->closeCursor();
+            }
+        }
+    }
+
+    public function getUserByEmail(string $email): ?array
+    {
+        try
+        {
+            $sql = $this->db->prepare('SELECT * FROM usuarios WHERE email = :email LIMIT 1');
+            $sql->bindParam(':email', $email, PDO::PARAM_STR);
+            $sql->execute();
+
+            if ($sql->rowCount() > 0) 
+            {
+                $data = $sql->fetch(PDO::FETCH_ASSOC);
+                return $data;
+            } 
+            else 
+            {
+                return null;
+            }
+        } 
+        catch(PDOException $err) 
+        {
+            error_log("Error al buscar el email:" . $err->getMessage());
+            return false;
+        } 
+        finally 
+        {
+            if(isset($sql)) 
+            {
+                $sql->closeCursor();
+            }
+        }
+    }
+
+    public function activateUser(array $user): bool
+    {
+        try 
+        {
+            $sql = $this->db->prepare('UPDATE usuarios SET confirmado = 1 WHERE email = :email');
+            $sql->bindParam(':email', $user['email'], PDO::PARAM_STR);
+            $sql->execute();
+            
+            if ($sql->rowCount() > 0) 
+            {
+                return true; 
+            } 
+            else 
+            {
+                return false; 
+            }
+        } 
+        catch (PDOException $err) 
+        {
+            error_log("Error al activar el usuario: " . $err->getMessage());
+            return false; 
         }
     }
 }    

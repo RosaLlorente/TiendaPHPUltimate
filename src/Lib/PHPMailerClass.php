@@ -126,4 +126,45 @@ class PHPMailerClass
             $_SESSION['error'] = 'No se ha podido enviar el correo de confirmación.';
         }
     }
+
+    public function sendVerificationEmail(string $correo, string $token): void
+    {
+        $mail = new PHPMailer(true);
+        try {
+            // Configuración del servidor
+            $mail->isSMTP();
+            $mail->Host = $_ENV['MAIL_HOST'];
+            $mail->SMTPAuth = true;
+            $mail->Port = $_ENV['MAIL_PORT'];;
+            $mail->Username = $_ENV['MAIL_USERNAME'];
+            $mail->Password = $_ENV['MAIL_PASSWORD'];   
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+
+            // Configuración UTF-8
+            $mail->CharSet = 'UTF-8';
+
+            // Destinatario
+            $mail->setFrom('TiendaPhp@mailtrap.io', 'TiendaPHP'); 
+            $mail->addAddress($correo);
+
+            // Contenido del correo
+            $mail->isHTML(true);
+            $mail->Subject = 'Confirma tu cuenta';
+            
+            $mensaje = "<h2>¡Usted debe verificar su correo electrónico!</h2>";
+            $mensaje .= "<p><b>Le solicitamos a </b> " . htmlspecialchars($correo) . " que por favor confirme su cuenta.</p>";
+            $mensaje .= "<p>Presiona aquí: <a href=" . BASE_URL ."User/verifyEmail?token=" . $token . "'>Confirmar cuenta</a></p>";
+            echo BASE_URL . "User/verifyEmail?token=" . $token;
+            $mensaje .= "<P>Si usted no ha solicitado esta acción, puede ignorar este correo.</p>";
+            $mail->Body = $mensaje;
+            // Enviar el correo
+            $mail->send();
+            $_SESSION['email'] = 'Succesful';
+        } 
+        catch (Exception $e) 
+        {
+            $_SESSION['email'] = 'Fail';
+            $_SESSION['error'] = 'No se ha podido enviar el correo de verificación.';
+        }
+    }
 }

@@ -2,17 +2,24 @@
 namespace Controllers;
 
 use Lib\Pages;
+use Lib\Security;
+use Lib\PHPMailerClass;
 use Models\User;
 use Services\UserService;
 
 class UserController{
     //PROPIEDADES
     private Pages $page;
+    private Security $security;
+    private PHPMailerClass $mailer;
     private UserService $userservice;
+
 
     //CONSTRUCTOR
     function __construct(){
         $this->page = new Pages();
+        $this->security = new Security();
+        $this->mailer = new PHPMailerClass();
         $this->userservice = new UserService();
     }
 
@@ -29,55 +36,66 @@ class UserController{
      */
     public function Register() : void
     {
-        if($_SERVER['REQUEST_METHOD'] == 'POST')
+        if ($_SERVER['REQUEST_METHOD'] === 'POST')
         {
-            if($_POST['data'])
-            {
-                $User = User::fromArray($_POST['data']);
-                $User->sanitate();
-                if($User->ValidateRegister())
-                {
-                    $password = password_hash($User->getpassword(), PASSWORD_BCRYPT,['cost'=>5]);
-                    $User->setpassword($password);
-                    try{
-                        $registerSuccess = $this->userservice->RegisterUser($User);
-                        if (!$registerSuccess)
-                        {
-                            $_SESSION['register'] = 'Complete';
-                            unset($_SESSION['errores']);
-                            $this->page->render('User/RegisterSuccessful');
-                        } 
-                        else 
-                        {
-                            $_SESSION['register'] = 'Fail';
-                            $error = 'El email ya está registrado.';
-                            echo '<p style="color:red">*'.htmlspecialchars($error).'</p>';
-                            $this->page->render('User/registerForm');
-                        }
-                    }
-                    catch(\Exception $e)
-                    {
-                        $_SESSION['register'] = 'Fail';
-                        $_SESSION['errores'] = $e->getMessage();
-                    }
-                }
-                else
-                {
-                    $_SESSION['register'] = 'Fail';
-                    $_SESSION['errores'] = User::getErrores();
-                    $_SESSION['old_data'] = $_POST['data'];
-                    if (isset($_SESSION['errores']) && is_array($_SESSION['errores']))
-                    {
-                        foreach ($_SESSION['errores'] as $error){
-                            echo '<p style="color:red">*'.htmlspecialchars($error).'</p>';
-                        }
-                    }
-                    $this->page->render('User/RegisterForm');
-                }
-            }
-            else
-            {
+            if (!isset($_POST['data'])) {
                 $_SESSION['register'] = 'Fail';
+                $this->page->render('User/RegisterForm');
+                return;
+            }
+
+            $User = User::fromArray($_POST['data']);
+            $User->sanitate(); // Corregido el nombre del método
+            
+            // Validar datos del usuario
+            if (!$User->ValidateRegister()) {
+                $_SESSION['register'] = 'Fail';
+                $_SESSION['errores'] = User::getErrores();
+                $_SESSION['old_data'] = $_POST['data'];
+                $this->page->render('User/RegisterForm');
+                return;
+            }
+
+            // Verificar si el correo ya está registrado
+            if ($this->userservice->checkUserByEmail($User->getEmail())) {
+                $_SESSION['register'] = 'Fail';
+                $_SESSION['errores'] = ['El email ya está registrado.'];
+                $this->page->render('User/RegisterForm');
+                return;
+            }
+
+            // Cifrar contraseña
+            $password = $this->security->encryptPassw($User->getPassword());
+            $User->setPassword($password);
+
+            try {
+                // Crear el token de activación
+                $secretKey = $this->security->getSecretKey();
+                $token = $this->security->createToken($secretKey, ['email' => $User->getEmail()]);
+                
+                // Añadir el token y la fecha de expiración al usuario
+                $User->setToken($token);
+                $User->setTokenExpiration(time() + 3600); // Expira en una hora
+
+                // Guardar el usuario en la base de datos
+                if ($this->userservice->RegisterUser($User))
+                {
+                    // Enviar correo de verificación
+                    $this->mailer->sendVerificationEmail($User->getEmail(), $token);
+                    
+                    $_SESSION['register'] = 'Complete';
+                    unset($_SESSION['errores']);
+                    $this->page->render('User/RegisterSuccessful');
+                    return;
+                }
+
+                // Si hay un fallo en la base de datos
+                throw new \Exception('Hubo un error al registrar el usuario.');
+
+            } catch (\Exception $e) {
+                $_SESSION['register'] = 'Fail';
+                $_SESSION['errores'] = [$e->getMessage()];
+                $this->page->render('User/RegisterForm');
             }
         }
         else
@@ -85,6 +103,8 @@ class UserController{
             $this->page->render('User/RegisterForm');
         }
     }
+
+
 
     /**
      * Logear al usuario en la base de datos.
@@ -169,4 +189,46 @@ class UserController{
         header('Location: ' . BASE_URL); 
         exit;
     }
+
+    public function VerifyEmail()
+    {die('llega');
+        if (isset($_GET['token'])) 
+        {die('llega');  
+            try 
+            {
+                $token = $_GET['token'];
+                $isActivated = $this->security->activateUserFromToken($token, $this->userservice);
+                
+                if ($isActivated) 
+                {
+                    $_SESSION['verification'] = 'complete';
+                    header('Location: ' . BASE_URL . '/login');  
+                    exit;
+                } 
+                else 
+                {
+                    $_SESSION['verification'] = 'fail';
+                    $_SESSION['errores'] = ['Usuario no encontrado o token inválido.'];
+                    header('Location: ' . BASE_URL . '/register');  
+                    exit;
+                }
+            } 
+            catch (\Exception $e) 
+            {
+                $_SESSION['verification'] = 'fail';
+                $_SESSION['errores'] = ['Error al verificar el token: ' . $e->getMessage()];
+                header('Location: ' . BASE_URL . '/register');
+                exit;
+            }
+        } 
+        else 
+        {
+            $_SESSION['verification'] = 'fail';
+            $_SESSION['errores'] = ['No se ha proporcionado un token.'];
+            header('Location: ' . BASE_URL . '/register');
+            exit;
+        }
+    }
+
+
 }

@@ -9,7 +9,7 @@
         <?php foreach ($categories as $category): ?>
             <li class="list-group-item d-flex flex-row justify-content-between align-items-center p-4 gap-5 mt-4">
                 <?= htmlspecialchars($category['nombre']) ?> 
-                    <?php if ($category['id'] !== '1'): ?>
+                    <?php if ($category['id'] !== 1): ?>
                         <a href="<?= BASE_URL ?>DeleteCategory/<?= $category['id'] ?>" class="btn btn-danger">Eliminar</a>
                         <form  action="<?= BASE_URL ?>EditCategory" method="POST" class="list-group-item d-flex flex-row justify-content-between align-items-center gap-5">
                             <input type="hidden" name="data[id]" value="<?= $category['id'] ?>">

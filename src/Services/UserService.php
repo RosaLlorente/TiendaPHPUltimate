@@ -24,9 +24,9 @@ class UserService{
      * 
      * @return User Devuelve los datos anteriormente introducidos por el usuario
      */
-    public function RegisterUser(User $user): void
+    public function RegisterUser(User $user): bool
     {
-        $this->userRepository->create($user);
+        return $this->userRepository->create($user);
     }
 
     /**
@@ -76,4 +76,20 @@ class UserService{
     {
         return $this->userRepository->getUserById($id);
     }
+
+    public function checkUserByEmail(string $email): bool
+    {
+        return$this->userRepository->checkUserByEmail($email);
+    }
+
+    public function getUserByEmail(string $email): ?array
+    {
+        return $this->userRepository->getUserByEmail($email);
+    }
+
+    public function activateUser(array $user): bool
+    {
+        return $this->userRepository->activateUser($user);
+    }
+    
 }
